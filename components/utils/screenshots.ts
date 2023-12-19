@@ -11,10 +11,15 @@ export const getWebsiteInfo = async (url) => {
   const publicPath = `/uploads/websites/${websiteId}`;
   const filePath = `${dirPath}/screenshot.png`;
   const jsonPath = `${dirPath}/info.json`;
-  if (fs.existsSync(filePath) && fs.existsSync(jsonPath)) {
+
+  if (fs.existsSync(jsonPath)) {
     // If the image exists, read it and return it
     const json = JSON.parse(fs.readFileSync(jsonPath));
-    return { icon: json.icon, screenshot: json.screenshot };
+    if (fs.existsSync(filePath)) {
+      return { icon: json.icon, screenshot: json.screenshot };
+    } else {
+      return { icon: json.icon, screenshot: "/placeholder.png" };
+    }
   }
   // Create the directory if it doesn't exist
   if (!fs.existsSync(dirPath)) {
@@ -29,11 +34,16 @@ export const getWebsiteInfo = async (url) => {
   // await page.setViewport({ width: 375, height: 800, deviceScaleFactor: 2 });
   try {
     await page.goto(url, {
-      // waitUntil: "networkidle2"
-      timeout: 2000,
+      waitUntil: "networkidle2",
+      // timeout: 2000,
     });
   } catch (error) {
     console.error("Navigation timed out:", error.message);
+    const websiteInfo = {
+      icon: "/placeholder.png",
+      screenshot: "/placeholder.png",
+    };
+    fs.writeFileSync(jsonPath, JSON.stringify(websiteInfo));
     return false;
     // Handle the timeout error
   }
@@ -52,7 +62,10 @@ export const getWebsiteInfo = async (url) => {
   const screenshot = await page.screenshot({
     // fullPage: true
   });
-  const websiteInfo = { icon: iconLink, screenshot: publicPath };
+  const websiteInfo = {
+    icon: iconLink,
+    screenshot: publicPath + "/screenshot.png",
+  };
   require("fs").writeFileSync(filePath, screenshot);
   fs.writeFileSync(jsonPath, JSON.stringify(websiteInfo));
 

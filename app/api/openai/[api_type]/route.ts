@@ -30,8 +30,7 @@ export async function POST(req: Request, { params }) {
       console.log(transcription.data.text);
       const query = await transcription.data.text;
       const response = await getBrowseQueryAndImage(query);
-      console.log(response);
-      return Response.json(response);
+      return Response.json({ query: query, results: response });
     } else {
       return Response.json(
         { success: false, error: "didn't understand api type" },
@@ -52,8 +51,15 @@ export async function GET(req: Request, { params }) {
       const searchParams = req.nextUrl.searchParams;
       const query = searchParams.get("query");
       const response = await getBrowseQueryAndImage(query);
-      console.log(response);
-      return Response.json(response);
+      if (response) {
+        console.log("get", response);
+        return Response.json({ query, results: response });
+      } else {
+        return Response.json(
+          { success: false, error: "didn't get well formed JSON" },
+          { status: 401 }
+        );
+      }
     } else {
       return Response.json(
         { success: false, error: "didn't understand api type" },
@@ -72,14 +78,18 @@ export async function GET(req: Request, { params }) {
 const getBrowseQueryAndImage = async (query) => {
   const response = await getBrowseQuery(query);
   console.log("query is", response);
-  const results = await Promise.all(
-    response.websites.map(async (site) => {
-      const info = await getWebsiteInfo(site.url);
-      return info ? { ...site, ...info } : null;
-    })
-  );
-  const filteredWebsites = results.filter((result) => result !== null);
-  return filteredWebsites;
+  if (response.websites) {
+    const results = await Promise.all(
+      response.websites.map(async (site) => {
+        const info = await getWebsiteInfo(site.url);
+        return info ? { ...site, ...info } : null;
+      })
+    );
+    const filteredWebsites = results.filter((result) => result !== null);
+    return filteredWebsites;
+  } else {
+    return false;
+  }
 };
 
 const getBrowseQuery = async (query) => {
@@ -89,6 +99,7 @@ const getBrowseQuery = async (query) => {
   if (fs.existsSync(jsonPath)) {
     // If the image exists, read it and return it
     const json = JSON.parse(fs.readFileSync(jsonPath));
+    console.log(jsonPath, json);
     return json;
   }
 
