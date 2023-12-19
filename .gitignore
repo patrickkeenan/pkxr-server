@@ -16,10 +16,6 @@
 # production
 /build
 
-# uploads
-public/uploads/*
-prototypes/*
-
 # misc
 .DS_Store
 **/.DS_Store
