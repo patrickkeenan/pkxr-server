@@ -54,98 +54,80 @@ app.prepare().then(() => {
 
   const wss = new Server({ server: wssServer });
   let speechClient;
+  let exporterClients = new Map();
+  let viewerClients = new Map();
+  let allClients = [];
 
   wss.on("connection", (socket) => {
-    if (!speechClient) {
-      speechClient = new speech.SpeechClient(); // Creates a client
-    }
-    let recognizeStream = speechClient
-      .streamingRecognize({
-        config: {
-          encoding: "LINEAR16",
-          sampleRateHertz: 16000,
-          languageCode: "en-US",
-        },
-        interimResults: true,
-      })
-      .on("data", (data) => {
-        console.log("got data", JSON.stringify(data));
-        socket.send(JSON.stringify(data));
-      })
-      .on("error", (error) => {
-        console.error("Error in recognition stream:", error);
-      });
+    socket.isAlive = true;
+    socket.on("pong", () => {
+      socket.isAlive = true;
+    });
+    socket.id = uniqueId();
 
-    socket.on("message", (message) => {
-      if (message instanceof Buffer) {
-        console.log("data is ", message);
-        // const arrayBuffer = Uint8Array.from(message).buffer;
-        // Write the audio data to a temporary file
-        fs.writeFile("temp.webm", message, async (err) => {
-          if (err) throw err;
-          // Send the temporary file to the OpenAI Whisper API
-          console.log(err);
-
-          const text = await transcribe(fs.createReadStream("temp.webm"));
-          console.log(text);
-          // openai.audio.transcriptions
-          //   .create({
-          //     model: "whisper-1",
-          //     file: fs.createReadStream("temp.webm"),
-          //   })
-          //   .then((response) => {
-          //     console.log(response);
-          //   });
-        });
-        // fs.writeFile("audio.webm", message, (err) => {
-        //   console.log("about to create", message, err);
-        //   if (err) throw err;
-        //   openai.audio.transcriptions
-        //     .create({
-        //       file: fs.createReadStream("audio.webm"),
-        //       model: "whisper-1",
-        //     })
-        //     .then((response) => {
-        //       console.log(response);
-        //     });
-        // });
-        // if (recognizeStream) {
-        //   recognizeStream.write(message);
-        // }
-      } else {
-        try {
-          const json = JSON.parse(message);
-          console.log("message", message.type);
-          if (json.type == "data_recording") {
-            if (!recognizeStream || recognizeStream.destroyed) {
-              // startRecognitionStream();
+    socket.on("message", (rawMessage) => {
+      const stringMessage = rawMessage.toString();
+      try {
+        const message = JSON.parse(stringMessage);
+        console.log("message", message);
+        if (message.type == "registerExporter") {
+          socket.clientId = message.clientId;
+          exporterClients.set(message.clientId, socket);
+        } else if (message.type == "registerViewer") {
+          socket.clientId = message.clientId;
+          console.log("set viewers", message);
+        } else if (message.type == "sendImage") {
+          wss.clients.forEach((ws) => {
+            if (ws.clientId == message.clientId) {
+              ws.send(
+                JSON.stringify({
+                  type: "receiveImage",
+                  imageUri: message.imageUri,
+                  imageName: message.imageName,
+                })
+              );
             }
-            if (recognizeStream) {
-              // recognizeStream.write(message);
+          });
+        } else if (message.type == "sendLayout") {
+          // const layout = JSON.parse(message.layout);
+          console.log("sending layout", message.layout);
+          wss.clients.forEach((ws) => {
+            if (ws.clientId == message.clientId) {
+              ws.send(
+                JSON.stringify({
+                  type: "receiveLayout",
+                  layout: message.layout,
+                })
+              );
             }
-          } else if (json.type == "start_recording") {
-            if (!recognizeStream || recognizeStream.destroyed) {
-              // startRecognitionStream();
-            }
-          } else if (json.type == "stop_recording") {
-            if (recognizeStream && !recognizeStream.destroyed) {
-              recognizeStream.end();
-            }
-          }
-        } catch (e) {
-          console.log("error with message", e);
+          });
         }
+      } catch (e) {
+        console.log("error, probably not JSON.", e.message);
       }
     });
 
     socket.on("close", () => {
-      if (recognizeStream && !recognizeStream.destroyed) {
-        recognizeStream.end();
-      }
+      console.log("Closed connection: ", socket.id);
     });
   });
+  // Ping every client every interval
+  setInterval(() => {
+    wss.clients.forEach((ws) => {
+      if (!ws.isAlive) {
+        return ws.terminate();
+      }
+      ws.isAlive = false;
+      ws.ping(() => {});
+    });
+    console.log("client count", wss.clients.size);
+  }, 5000);
 
   wssServer.listen(8081, () => {
     console.log("WebSocket server is running on wss://localhost:8081");
   });
 });
+
+function uniqueId() {
+  return Math.floor(Math.random() * Date.now()).toString();
+}

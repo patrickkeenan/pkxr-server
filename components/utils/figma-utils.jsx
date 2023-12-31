@@ -2,7 +2,7 @@ import React from "react";
 import * as THREE from "three";
 // import { RootContainer, Image, Text, Container } from "@coconut-xr/koestlich";
 // import { makeBorderMaterial } from "@coconut-xr/xmaterials";
-import { promises as fs } from "fs";
+import fs from "fs";
 import path from "path";
 import template from "lodash.template";
 
@@ -14,7 +14,7 @@ export async function figmaToComponents(layoutObject) {
     layoutObject,
     0,
     0,
-    `prototypes/${layoutObject.componentName}`,
+    `prototypes/${layoutObject.id}`,
     `index.tsx`
   );
   createChildComponents(layoutObject, layoutObject, 0, 0);
@@ -25,7 +25,7 @@ async function createChildComponents(layer, layoutObject, depth, index) {
     layer,
     depth,
     index,
-    `prototypes/${layoutObject.componentName}`,
+    `prototypes/${layoutObject.id}`,
     `${layer.componentName}.tsx`
   );
   let i = 0;
@@ -43,11 +43,18 @@ async function writeTemplateToFile(
   dirPath,
   fileName
 ) {
+  console.log("reading file", `components/templates/${templateName}.template`);
   // Read the template file
   const layerContent = await fs.readFile(
     `components/templates/${templateName}.template`,
-    "utf8"
+    "utf8",
+    (err, data) => {
+      if (err) console.log(err);
+      // cb(null, data);
+    }
   );
+  console.log("read file", `components/templates/${templateName}.template`);
+
   // // Create a template function
   const layerTemplate = template(layerContent);
   const layerComponent = layerTemplate({
@@ -74,8 +81,8 @@ async function writeTemplateToFile(
   // // Write the output to a new file
   // const dirPath = `prototypes/${layer.componentName}`;
   // Create the directory if it doesn't exist
-  await fs.mkdir(dirPath, { recursive: true });
-  await fs.writeFile(dirPath + "/" + fileName, layerComponent);
+  await fs.promises.mkdir(dirPath, { recursive: true });
+  await fs.promises.writeFile(dirPath + "/" + fileName, layerComponent);
 }
 
 export function FigmaLayout({ layoutObject, ...props }) {
@@ -144,4 +151,8 @@ export function createElements(layer, depth, index) {
       )}
     </Container>
   );
+}
+
+export function uniqueId() {
+  return Math.floor(Math.random() * Date.now()).toString();
 }

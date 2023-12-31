@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import path from "path";
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 
 export const POST = async (req: { formData: () => any }, res: any) => {
   const formData = await req.formData();
+  const rootLayerId = formData.get("rootLayerId");
+  const documentId = formData.get("documentId");
   const file = formData.get("image");
   if (!file) {
     return new Response("No files received", { status: 400 });
@@ -14,10 +16,9 @@ export const POST = async (req: { formData: () => any }, res: any) => {
   const filename = file.name;
 
   try {
-    await writeFile(
-      path.join(process.cwd(), "public/uploads/images/" + filename),
-      buffer
-    );
+    let dirPath = `public/uploads/layouts/${toSafeString(rootLayerId)}`;
+    await mkdir(dirPath, { recursive: true });
+    await writeFile(path.resolve(process.cwd(), dirPath, filename), buffer);
     return new Response("Image file written successfully", {
       status: 201,
     });
@@ -54,3 +55,5 @@ export const POST = async (req: { formData: () => any }, res: any) => {
 //           return res.status(500).json({ Message: "Failed" });
 //         });
 //     });
+
+const toSafeString = (str) => str.replace(/[^\w\s]/gi, "");

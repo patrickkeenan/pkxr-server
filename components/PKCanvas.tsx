@@ -27,6 +27,7 @@ import {
 } from "@coconut-xr/natuerlich/react";
 import { RootContainer, Container } from "@coconut-xr/koestlich";
 import { ArrowLeft } from "@phosphor-icons/react";
+import Link from "next/link";
 
 const sessionOptions = {
   requiredFeatures: [
@@ -55,13 +56,14 @@ export default function PKCanvas({
   }, []);
 
   const enterAR = useEnterXR("immersive-ar", sessionOptions);
-
+  const [devicePixelRatio, setDevicePixelRatio] = useState(1);
   const frameBufferScaling = useNativeFramebufferScaling();
   const heighestAvailableFramerate = useHeighestAvailableFrameRate();
 
   const [isQuest, setIsQuest] = useState("");
   useEffect(() => {
     const xr = (navigator as any)?.xr as XRSystem;
+    setDevicePixelRatio(window.devicePixelRatio);
     if (!xr) {
       setIsQuest("notQuest");
     } else {
@@ -93,7 +95,7 @@ export default function PKCanvas({
         }}
       ></div> */}
       <XRCanvas
-        dpr={window.devicePixelRatio}
+        dpr={devicePixelRatio}
         gl={{ localClippingEnabled: true, preserveDrawingBuffer: true }}
         frameBufferScaling={frameBufferScaling}
         frameRate={heighestAvailableFramerate}
@@ -218,18 +220,17 @@ export default function PKCanvas({
         />
         <SessionModeGuard deny="immersive-ar">
           <Suspense>
-            <Environment blur={0.05} preset="apartment" background />
+            <Environment blur={0.05} files="/scenes/apartment.hdr" background />
           </Suspense>
         </SessionModeGuard>
 
         {children}
       </XRCanvas>
-      <button
-        className={"button button-back"}
-        onClick={() => (window.location.href = "../")}
-      >
-        <ArrowLeft size={16} />
-      </button>
+      <Link href="/">
+        <button className={"button button-back"}>
+          <ArrowLeft size={16} />
+        </button>
+      </Link>
 
       {isQuest == "quest" && (
         <button className={"button"} onClick={enterAR}>
