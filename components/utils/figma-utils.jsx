@@ -137,13 +137,7 @@ export async function figmaToComponents(doc) {
   // Each variant should flow down the components
 
   const filePath = path.join(__dirname, "components/templates/Scene.template");
-  const sceneContent = await fs.promises.readFile(
-    filePath,
-    "utf8",
-    (err, data) => {
-      if (err) console.log(err);
-    }
-  );
+  const sceneContent = await fs.promises.readFile(filePath, "utf8");
   const sceneTemplate = template(sceneContent);
 
   // For rendering components in the root of the scene
