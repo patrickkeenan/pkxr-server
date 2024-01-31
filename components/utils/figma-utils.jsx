@@ -136,8 +136,9 @@ export async function figmaToComponents(doc) {
   // Set the variant to the first variant id
   // Each variant should flow down the components
 
+  const filePath = path.join(__dirname, "components/templates/Scene.template");
   const sceneContent = await fs.promises.readFile(
-    `components/templates/Scene.template`,
+    filePath,
     "utf8",
     (err, data) => {
       if (err) console.log(err);
