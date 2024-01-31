@@ -7,7 +7,7 @@ export async function POST(req: Request, { params }) {
   const fileName = params.fileName;
   const formData = await req.formData();
   const layerId = formData.get("layerId");
-  const fileValue = formData.get("fileValue") as;
+  const fileValue = formData.get("fileValue") as string;
   console.log("Post req", formData);
   try {
     let dirPath = `prototypes/${layerId}`;
