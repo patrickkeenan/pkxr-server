@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import path from "path";
 import { writeFile, mkdir } from "fs/promises";
 
@@ -56,5 +55,21 @@ export const POST = async (req: Request, res: any) => {
 //           return res.status(500).json({ Message: "Failed" });
 //         });
 //     });
+
+export async function OPTIONS(request: Request) {
+  const allowedOrigin = request.headers.get("origin");
+  const response = new Response(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": allowedOrigin || "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers":
+        "Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version",
+      "Access-Control-Max-Age": "86400",
+    },
+  });
+
+  return response;
+}
 
 const toSafeString = (str) => str.replace(/[^\w\s]/gi, "");
