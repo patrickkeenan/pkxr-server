@@ -136,17 +136,16 @@ export async function figmaToComponents(doc) {
   // Set the variant to the first variant id
   // Each variant should flow down the components
 
-  const filePath = path.join(__dirname, "components/templates/Scene.template");
-  const sceneContent = await fs.promises.readFile(filePath, "utf8");
+  const sceneContent = await fs.promises.readFile(
+    path.join(process.cwd(), "components/templates/Scene.template"),
+    "utf8"
+  );
   const sceneTemplate = template(sceneContent);
 
   // For rendering components in the root of the scene
   const rootComponentsContent = await fs.promises.readFile(
-    `components/templates/RootComponents.template`,
-    "utf8",
-    (err, data) => {
-      if (err) console.log(err);
-    }
+    path.join(process.cwd(), "components/templates/RootComponents.template"),
+    "utf8"
   );
   const rootComponentsTemplate = template(rootComponentsContent);
   // Loop through components and build them out
@@ -224,11 +223,11 @@ export async function figmaToComponents(doc) {
 
   // For rendering definitions of components
   const componentDefintionContent = await fs.promises.readFile(
-    `components/templates/ComponentDefintion.template`,
-    "utf8",
-    (err, data) => {
-      if (err) console.log(err);
-    }
+    path.join(
+      process.cwd(),
+      "components/templates/ComponentDefintion.template"
+    ),
+    "utf8"
   );
   const componentDefintionTemplate = template(componentDefintionContent);
   // Loop through components and build them out
