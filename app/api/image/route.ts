@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import path from "path";
 import { writeFile, mkdir } from "fs/promises";
 
-export const POST = async (req: { formData: () => any }, res: any) => {
+export const POST = async (req: Request, res: any) => {
   const formData = await req.formData();
   const rootLayerId = formData.get("rootLayerId");
   const documentId = formData.get("documentId");
-  const file = formData.get("image");
+  const file = formData.get("image") as File;
   if (!file) {
     return new Response("No files received", { status: 400 });
   }

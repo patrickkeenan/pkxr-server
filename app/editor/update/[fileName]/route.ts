@@ -2,12 +2,12 @@ import fs from "fs";
 import path from "path";
 // import { writeFile, mkdir } from "fs/promises";
 
-export async function POST(req: { formData: () => any }, { params }) {
+export async function POST(req: Request, { params }) {
   console.log("Post req");
   const fileName = params.fileName;
   const formData = await req.formData();
   const layerId = formData.get("layerId");
-  const fileValue = formData.get("fileValue");
+  const fileValue = formData.get("fileValue") as string;
   console.log("Post req", formData);
   try {
     let dirPath = `prototypes/${layerId}`;

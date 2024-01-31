@@ -53,7 +53,7 @@ export default function PKCanvas({
 }) {
   useEffect(() => {
     document.title = title;
-  }, []);
+  }, [title]);
 
   const enterAR = useEnterXR("immersive-ar", sessionOptions);
   const [devicePixelRatio, setDevicePixelRatio] = useState(1);
@@ -389,22 +389,6 @@ export function PKLink({
       </RootContainer>
       {children}
     </mesh>
-  );
-}
-
-export function PKNestedLayers({ layer, rootLayer, ...props }) {
-  return (
-    <>
-      <PKLayer layer={layer} rootLayer={rootLayer} />
-      {layer.children.map((subLayer, i) => (
-        <PKNestedLayers
-          layer={subLayer}
-          rootLayer={rootLayer}
-          index={i}
-          key={i}
-        />
-      ))}
-    </>
   );
 }
 
