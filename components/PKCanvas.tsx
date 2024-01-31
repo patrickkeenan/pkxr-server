@@ -25,7 +25,7 @@ import {
   DynamicHandModel,
   HandBoneGroup,
 } from "@coconut-xr/natuerlich/react";
-import { RootContainer, Container } from "@coconut-xr/koestlich";
+import { RootContainer, Container, Image } from "@coconut-xr/koestlich";
 import { ArrowLeft } from "@phosphor-icons/react";
 import Link from "next/link";
 
@@ -214,8 +214,8 @@ export default function PKCanvas({
         )}
 
         <OrbitControls
-          position={[0, 1.5, -1]}
-          target={[0, 1.5, 0]}
+          position={[0, 1.5, -3]}
+          target={[0, 1.5, -1]}
           makeDefault
         />
         <SessionModeGuard deny="immersive-ar">
@@ -237,7 +237,7 @@ export default function PKCanvas({
           Enter AR
         </button>
       )}
-      {isQuest == "notQuest" && (
+      {/* {isQuest == "notQuest" && (
         <button
           className={"button"}
           onClick={() => {
@@ -248,10 +248,167 @@ export default function PKCanvas({
         >
           Send to Quest
         </button>
-      )}
+      )} */}
     </>
   );
 }
+
+// THOUGHT: These components take in a nested object and render all children,
+// I need a function that just takes in layer properties and renders that component
+// Probably the rendering of children should be done in some other function
+// So that I can use this for the dynamic layout rendering as well as rending out component files
+export function PKRootLayer({ layer, ...props }) {
+  console.log("build", layer);
+  return (
+    <mesh position={[0, 1.5, -2]}>
+      <RootContainer pixelSize={0.0007} precision={0.1}>
+        <Container width={layer.width} height={layer.height}></Container>
+      </RootContainer>
+    </mesh>
+  );
+}
+
+export function PKLayer({
+  children = <></>,
+  imageUrl,
+  width = 0,
+  height = 0,
+  x = 0,
+  y = 0,
+  z = 0,
+  scaleX = 0,
+  scaleY = 0,
+  scaleZ = 0,
+  rotationX = 0,
+  rotationY = 0,
+  rotationZ = 0,
+  rootWidth = 0,
+  rootHeight = 0,
+  ...props
+}) {
+  if (!imageUrl) {
+    return <></>;
+  }
+
+  return (
+    <mesh position={[0, 0, 0]}>
+      <RootContainer
+        pixelSize={0.0007}
+        precision={0.1}
+        position={[0, 0, 0]}
+        sizeX={rootWidth * 0.0007}
+        sizeY={rootHeight * 0.0007}
+      >
+        <Container
+          // key={layer.id}
+          positionType="relative"
+          positionLeft={x}
+          positionTop={y}
+          translateZ={z}
+          minWidth={width}
+          width={width}
+          height={height}
+          {...props}
+        >
+          <Suspense>
+            <Image url={imageUrl} width={width} height={height} />
+          </Suspense>
+        </Container>
+      </RootContainer>
+      {children}
+    </mesh>
+  );
+}
+
+export function PKLink({
+  children = [],
+  width = 0,
+  height = 0,
+  x = 0,
+  y = 0,
+  z = 10,
+  scaleX = 0,
+  scaleY = 0,
+  scaleZ = 0,
+  rotationX = 0,
+  rotationY = 0,
+  rotationZ = 0,
+  rootWidth = 0,
+  rootHeight = 0,
+  linkTo = "",
+  onClick = (linkTo) => console.log("link", linkTo),
+  ...props
+}) {
+  const [highlight, setHighlight] = useState(false);
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.keyCode === 16) {
+        console.log("Shift key was pressed1", event.keyCode);
+        setHighlight(true);
+      }
+    };
+    const handleKeyUp = (event) => {
+      if (event.keyCode === 16) {
+        console.log("Shift key was unpressed", event.keyCode);
+        setHighlight(false);
+      }
+    };
+    // Add event listener
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    // Cleanup: remove event listener when the component is unmounted
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []); // Empty dependency array means this effect runs once on mount and cleanup on unmount
+
+  return (
+    <mesh position={[0, 0, 0]}>
+      <RootContainer
+        pixelSize={0.0007}
+        precision={0.1}
+        position={[0, 0, 0]}
+        sizeX={rootWidth * 0.0007}
+        sizeY={rootHeight * 0.0007}
+      >
+        <Container
+          // key={layer.id}
+          positionType="relative"
+          positionLeft={x}
+          positionTop={y}
+          translateZ={z}
+          minWidth={width}
+          width={width}
+          height={height}
+          backgroundColor={"#f09"}
+          backgroundOpacity={highlight ? 0.5 : 0}
+          onClick={() => onClick(linkTo)}
+          {...props}
+        ></Container>
+      </RootContainer>
+      {children}
+    </mesh>
+  );
+}
+
+export function PKNestedLayers({ layer, rootLayer, ...props }) {
+  return (
+    <>
+      <PKLayer layer={layer} rootLayer={rootLayer} />
+      {layer.children.map((subLayer, i) => (
+        <PKNestedLayers
+          layer={subLayer}
+          rootLayer={rootLayer}
+          index={i}
+          key={i}
+        />
+      ))}
+    </>
+  );
+}
+
+const toSafeString = (str) => str.replace(/[^\w\s]/gi, "");
 
 export function HeadLocked({
   children,

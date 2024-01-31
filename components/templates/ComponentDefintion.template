@@ -1,0 +1,3 @@
+function <%= componentName %>({ ...props }) {
+  return <PKLayer {...props} />;
+}

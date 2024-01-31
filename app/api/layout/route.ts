@@ -1,10 +1,7 @@
 import path from "path";
 import { writeFile, mkdir } from "fs/promises";
 import { figmaLayoutString } from "../../../components/figma-utils-string";
-import {
-  FigmaLayout,
-  figmaToComponents,
-} from "../../../components/utils/figma-utils";
+import { figmaToComponents } from "../../../components/utils/figma-utils";
 export const dynamic = "force-dynamic"; // defaults to auto
 
 export async function GET(request: Request) {
@@ -20,16 +17,17 @@ export async function GET(request: Request) {
 
 export async function POST(req: Request) {
   const data = await req.json();
-  const pageId = data.pageId;
-  const documentId = data.documentId;
-  const rootLayerId = data.id;
-  const rootLayerName = data.name;
+  // const pageId = data.pageId;
+  // const documentId = data.documentId;
+  const documentId = data.id;
+  // const rootLayerName = data.name;
   let json = JSON.stringify(data, null, 2);
 
   try {
     await figmaToComponents(data);
+    console.log("writing doc", documentId);
 
-    let dirPath = `public/uploads/layouts/${toSafeString(rootLayerId)}`;
+    let dirPath = `public/uploads/layouts/${toSafeString(documentId)}`;
     await mkdir(dirPath, { recursive: true });
 
     await writeFile(path.resolve(process.cwd(), dirPath, `layout.json`), json);
@@ -39,7 +37,7 @@ export async function POST(req: Request) {
     //   figmaLayoutString(data)
     // );
 
-    console.error("wrote JSON");
+    console.log("wrote JSON");
     return new Response("JSON file written successfully", {
       status: 200,
       headers: {

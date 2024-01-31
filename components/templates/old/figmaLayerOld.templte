@@ -1,0 +1,93 @@
+import React, { useState, useRef, useEffect } from "react";
+import * as THREE from "three";
+import PKCanvas, { PKRootLayer, PKLayer, PKLink } from "@/components/PKCanvas";
+
+<%
+const toSafeString = (str) => str.replace(/[^\w\s]/gi, "");
+// const {children,...rootLayerInfo} = layer;
+const imageDir = `/uploads/layouts/${toSafeString(documentId)}`
+
+function renderComponentDefinitions(layer,rootLayer){
+    if(layer.type == "ROOT") rootLayer = layer;
+    
+    const {children,...layerInfo} = layer
+    const componentName = layer.componentName;
+    const imageUrl = `${imageDir}/${layer.imageName}`
+    const props = ["name","width","height","x","y","z","scaleX","scaleY","scaleZ","rotationX","rotationY","rotationZ","linkTo"]
+    const propValString = props.map((prop,i)=>{
+        if(layerInfo[prop]) return `${prop}={${(typeof layerInfo[prop] == "string") ? '"'+layerInfo[prop]+'"' : layerInfo[prop]}}`
+    }).join(" ")
+    let layerString = `function ${componentName}({...props}){`;
+    
+    layerString += `return (<><PKLayer ${propValString} rootWidth={${rootLayer.width}} rootHeight={${rootLayer.height}} imageUrl={"${imageUrl}"} {...props}  />`
+    console.log("links",layer?.links)
+    if(layer.links && layer.links.length > 0){
+      layer.links.forEach((link)=>{
+        const propValString = props.map((prop,i)=>{
+          if(link[prop]) return `${prop}={${(typeof link[prop] == "string") ? '"'+link[prop]+'"' : link[prop]}}`
+      }).join(" ")
+        layerString += `<PKLink onClick={()=>if(props.onLink) props.onLink(${link.linkTo})} ${propValString} rootWidth={${rootLayer.width}} rootHeight={${rootLayer.height}} {...props}  />`
+      })
+    }
+    layerString += `</>)`
+    layerString += `}`
+
+    if(children.length >0){
+      children.forEach((subLayer,i)=>{
+          layerString += renderComponentDefinitions(subLayer,rootLayer)
+      })
+    }
+
+    return layerString;
+}
+function renderRootComponents(layer,rootLayer){
+    const {children,...layerInfo} = layer;
+    const componentName = layer.componentName;
+    let code = "";
+    let props = [];
+    // Do this if there's links
+    if(layer.links && layer.links.length > 0) props.push(`onClick = {(link)=>setFlowStep(link)}`)
+    if(children.length >0){
+        children.forEach((subLayer,i)=>{
+            let subCode = renderRootComponents(subLayer,rootLayer)
+            if(layer && layer == rootLayer) subCode = `{flowStep == "${subLayer.componentName}" && (${subCode})}\n`
+            code += subCode
+        })
+        
+        if(layer && layer != rootLayer) code = `<mesh ${props.join(" ")} name="${componentName}">\n<${componentName} />\n${code}</mesh>\n`
+    }else{
+        code = `<${componentName} />\n`
+    }
+    
+    return code
+}
+const rootComponents = Object.keys(layout).map((componentName)=>{
+  const variants = layout[componentName]
+  renderRootComponents(variants[0],variants[0]);
+}).join("\n")
+
+const componentDefintions = Object.keys(layout).map((componentName)=>{
+  const variants = layout[componentName]
+  renderComponentDefinitions(variants[0],variants[0]);
+}).join("\n")
+
+%>
+
+function Scene({ ...props }) {
+  const [flowStep, setFlowStep] = useState("<%= layer.children[0].componentName %>");
+  return (
+    <mesh position={[0, 0, 0]}>
+    <%= rootComponents %>
+    </mesh>
+  );
+}
+
+<%= componentDefintions %>
+
+export default function Prototype() {
+  return (
+    <PKCanvas>
+      <Scene />
+    </PKCanvas>
+  );
+}

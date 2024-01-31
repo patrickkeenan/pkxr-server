@@ -14,6 +14,7 @@ export const POST = async (req: { formData: () => any }, res: any) => {
   const buffer = Buffer.from(await file.arrayBuffer());
 
   const filename = file.name;
+  console.log("writing image:", filename, buffer);
 
   try {
     let dirPath = `public/uploads/layouts/${toSafeString(rootLayerId)}`;

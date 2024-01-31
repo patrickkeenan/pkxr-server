@@ -1,0 +1,23 @@
+import React, { useState, useRef, useEffect } from "react";
+import * as THREE from "three";
+import PKCanvas, { PKRootLayer, PKLayer, PKLink } from "@/components/PKCanvas";
+
+function Scene({ ...props }) {
+  
+  return (
+    <mesh position={[0, 1.5, -1]}>
+    <%= rootComponents %>
+    </mesh>
+  );
+}
+
+
+export default function Prototype() {
+  return (
+    <PKCanvas>
+      <Scene />
+    </PKCanvas>
+  );
+}
+
+<%= componentDefinitions %>
