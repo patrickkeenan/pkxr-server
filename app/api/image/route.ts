@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import path from "path";
 import { writeFile, mkdir } from "fs/promises";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { storage } from "@/lib/firebase/firebase";
 
 export const POST = async (req: Request, res: any) => {
   const formData = await req.formData();
@@ -16,17 +18,37 @@ export const POST = async (req: Request, res: any) => {
   const filename = file.name;
   console.log("writing image:", filename, buffer);
 
-  try {
-    let dirPath = `public/uploads/layouts/${toSafeString(rootLayerId)}`;
-    await mkdir(dirPath, { recursive: true });
-    await writeFile(path.resolve(process.cwd(), dirPath, filename), buffer);
-    return new Response("Image file written successfully", {
+  let dirPath = `layouts/${toSafeString(rootLayerId)}`;
+
+  const isDevelopment = false;
+  if (isDevelopment) {
+    // This is a dev server: Write the files directly to the server
+    try {
+      let devDirPath = `public/uploads/${dirPath}`;
+      await mkdir(dirPath, { recursive: true });
+      await writeFile(
+        path.resolve(process.cwd(), devDirPath, filename),
+        buffer
+      );
+      return new Response("Image file written successfully", {
+        status: 201,
+      });
+    } catch (error) {
+      console.log("Error occured ", error);
+      return new Response("Image Failed", {
+        status: 200,
+      });
+    }
+  } else {
+    // This is production: Write the files to firebase storage
+    let prodDirPath = `${dirPath}/${filename}`;
+    console.log("is production, write", dirPath);
+    const newImageRef = ref(storage, prodDirPath);
+    await uploadBytesResumable(newImageRef, file);
+    const url = await getDownloadURL(newImageRef);
+    console.log("wrote file:", url);
+    return new Response(`Image file written successfully: ${url}`, {
       status: 201,
-    });
-  } catch (error) {
-    console.log("Error occured ", error);
-    return new Response("Image Failed", {
-      status: 200,
     });
   }
 };
