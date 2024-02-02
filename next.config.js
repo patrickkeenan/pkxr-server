@@ -3,6 +3,13 @@ const nextConfig = {
   // experimental: {
   //   https: true,
   // },
+  experimental: {
+    urlImports: [
+      "https://example.com/assets/",
+      "https://cdn.skypack.dev",
+      "https://firebasestorage.googleapis.com",
+    ],
+  },
   async headers() {
     return [
       {

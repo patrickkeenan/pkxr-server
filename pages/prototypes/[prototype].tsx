@@ -6,18 +6,19 @@ import { useState, useEffect, ComponentType } from "react";
 function PrototypeHome() {
   const router = useRouter();
   const { prototype } = router.query;
+  return <div>test</div>;
 
-  const [DynamicComponent, setDynamicComponent] =
-    useState<React.ComponentType<any> | null>(null);
-  useEffect(() => {
-    const loadComponent = async () => {
-      // Dynamically import the component
-      const component = dynamic(() => import(`@/editor/${prototype}/file`));
-      setDynamicComponent(() => component);
-    };
-    loadComponent();
-  }, []);
-  return <div>{DynamicComponent && <DynamicComponent />}</div>;
+  // const [DynamicComponent, setDynamicComponent] =
+  //   useState<React.ComponentType<any> | null>(null);
+  // useEffect(() => {
+  //   const loadComponent = async () => {
+  //     // Dynamically import the component
+  //     const component = dynamic(() => import(`@/editor/${prototype}/file`));
+  //     setDynamicComponent(() => component);
+  //   };
+  //   loadComponent();
+  // }, []);
+  // return <div>{DynamicComponent && <DynamicComponent />}</div>;
   // Server side dynamic importing
   // const [DynamicComponent, setDynamicComponent] =
   //   useState<ComponentType | null>(null);
