@@ -60,20 +60,20 @@ export default function EditorPage() {
   //   globalThis["Canvas"] = Canvas;
   //   globalThis["OrbitControls"] = OrbitControls;
 
-  const fileName = "tstest";
-  const url = `https://firebasestorage.googleapis.com/v0/b/pkxr-413012.appspot.com/o/layouts%2Ftstest.tsx?alt=media&token=72471a3f-954e-410f-afe1-64e62bbb6dc5`;
-  const App = dynamic(
-    () =>
-      //@ts-ignore
-      import(
-        "https://firebasestorage.googleapis.com/v0/b/pkxr-413012.appspot.com/o/layouts%2Ftstest.tsx?alt=media&token=72471a3f-954e-410f-afe1-64e62bbb6dc5"
-      ),
-    {
-      loading: () => <p>Loading...</p>,
-    }
-  );
+  //   const fileName = "tstest";
+  //   const url = `https://firebasestorage.googleapis.com/v0/b/pkxr-413012.appspot.com/o/layouts%2Ftstest.tsx?alt=media&token=72471a3f-954e-410f-afe1-64e62bbb6dc5`;
+  //   const App = dynamic(
+  //     () =>
+  //       //@ts-ignore
+  //       import(
+  //         "https://firebasestorage.googleapis.com/v0/b/pkxr-413012.appspot.com/o/layouts%2Ftstest.tsx?alt=media&token=72471a3f-954e-410f-afe1-64e62bbb6dc5"
+  //       ),
+  //     {
+  //       loading: () => <p>Loading...</p>,
+  //     }
+  //   );
 
-  return <App />;
+  return <div>test</div>;
   //   <div>{eval(transpiledCode)}</div>;
   //   return new Function(`return ${transpiledCode}`)();
 
