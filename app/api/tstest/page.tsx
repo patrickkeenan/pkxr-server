@@ -7,7 +7,7 @@ import { transform } from "@babel/standalone";
 import { Environment, OrbitControls, Sphere } from "@react-three/drei";
 import dynamic from "next/dynamic";
 //@ts-ignore
-import App from "https://firebasestorage.googleapis.com/v0/b/pkxr-413012.appspot.com/o/layouts%2Ftstest.tsx?alt=media&token=50f13637-00de-4d7b-9cfe-2870a3e73023";
+// import App from "https://firebasestorage.googleapis.com/v0/b/pkxr-413012.appspot.com/o/layouts%2Ftstest.tsx?alt=media&token=50f13637-00de-4d7b-9cfe-2870a3e73023";
 
 export default function EditorPage() {
   const inputString = `import {OrbitControls} from "https://esm.sh/@react-three/drei";
@@ -59,12 +59,19 @@ export default function EditorPage() {
   //   globalThis["React"] = React;
   //   globalThis["Canvas"] = Canvas;
   //   globalThis["OrbitControls"] = OrbitControls;
-  //   const DynamicHeader = dynamic(
-  //     () => import("https://192.168.86.38:3000/api/test"),
-  //     {
-  //       loading: () => <p>Loading...</p>,
-  //     }
-  //   );
+
+  const fileName = "tstest";
+  const url = `https://firebasestorage.googleapis.com/v0/b/pkxr-413012.appspot.com/o/layouts%2Ftstest.tsx?alt=media&token=72471a3f-954e-410f-afe1-64e62bbb6dc5`;
+  const App = dynamic(
+    () =>
+      //@ts-ignore
+      import(
+        "https://firebasestorage.googleapis.com/v0/b/pkxr-413012.appspot.com/o/layouts%2Ftstest.tsx?alt=media&token=72471a3f-954e-410f-afe1-64e62bbb6dc5"
+      ),
+    {
+      loading: () => <p>Loading...</p>,
+    }
+  );
 
   return <App />;
   //   <div>{eval(transpiledCode)}</div>;

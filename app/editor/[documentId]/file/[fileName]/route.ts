@@ -1,20 +1,14 @@
 import fs from "fs";
 import path from "path";
 
-import {
-  collection,
-  doc,
-  Timestamp,
-  setDoc,
-  onSnapshot,
-} from "firebase/firestore";
+import { collection, doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase/firebase";
 
 export async function GET(req: Request, { params }) {
   const { documentId, fileName } = params;
   console.log("get req");
 
-  const isDevelopment = false;
+  const isDevelopment = true;
   if (isDevelopment) {
     // This is a dev server: Write the files directly to the server
     const content = await fs.promises.readFile(

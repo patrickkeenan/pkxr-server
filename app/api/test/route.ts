@@ -99,7 +99,7 @@ export async function GET(request: Request) {
       "310:239489": {
         variantIndex: 0,
         imageUrl:
-          "/uploads/layouts/fa1e29a064914eac8b858600e656f703/WhatsAppExample_WhatsAppExample_0.png",
+          "/uploads/placeholder.png",
         id: "310:239489",
         x: 0,
         y: 0,
@@ -109,7 +109,7 @@ export async function GET(request: Request) {
       "310:237884": {
         variantIndex: 1,
         imageUrl:
-          "/uploads/layouts/fa1e29a064914eac8b858600e656f703/WhatsAppExample_WhatsAppExample_1.png",
+          "/uploads/placeholder.png",
         id: "310:237884",
         x: 0,
         y: 0,

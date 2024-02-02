@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   const documentId = data.id;
   // const rootLayerName = data.name;
 
-  const isDevelopment = false;
+  const isDevelopment = true;
   if (isDevelopment) {
     // This is a dev server: Write the files directly to the server
     let json = JSON.stringify(data, null, 2);

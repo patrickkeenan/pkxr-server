@@ -20,7 +20,7 @@ export const POST = async (req: Request, res: any) => {
 
   let dirPath = `layouts/${toSafeString(rootLayerId)}`;
 
-  const isDevelopment = false;
+  const isDevelopment = true;
   if (isDevelopment) {
     // This is a dev server: Write the files directly to the server
     try {
