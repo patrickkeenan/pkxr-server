@@ -135,6 +135,17 @@ export default function PKCanvas({
             cameraContent={
               <>
                 <Sphere
+                  position={[0, 0, 0]}
+                  onUpdate={(self) => {
+                    self.userData.name = "head-front-0";
+                  }}
+                  scale={0.00001}
+                  material-color={"#f90"}
+                  material-transparent={true}
+                  material-opacity={0}
+                  material-side={THREE.DoubleSide}
+                />
+                <Sphere
                   position={[0, 0, -1]}
                   onUpdate={(self) => {
                     self.userData.name = "head-front-1";
@@ -188,9 +199,9 @@ export default function PKCanvas({
                   <Container
                     width={880}
                     height={640}
-                    borderColor={"#fff"}
-                    borderOpacity={0.2}
-                    border={4}
+                    // borderColor={"#fff"}
+                    // borderOpacity={0.2}
+                    // border={4}
                     borderRadius={40}
                   ></Container>
                 </RootContainer>
@@ -209,7 +220,7 @@ export default function PKCanvas({
             modelRight="hand-right.gltf"
             rayMaterial={{ color: "blue" }}
           /> */}
-            {/* <HandGestureLayer /> */}
+            <HandGestureLayer />
           </ImmersiveSessionOrigin>
         )}
 
@@ -271,6 +282,8 @@ export function PKRootLayer({ layer, ...props }) {
 export function PKLayer({
   children = <></>,
   imageUrl,
+  id,
+  offsetPosition,
   width = 0,
   height = 0,
   x = 0,
@@ -282,20 +295,27 @@ export function PKLayer({
   rotationX = 0,
   rotationY = 0,
   rotationZ = 0,
-  rootWidth = 0,
-  rootHeight = 0,
+  rootWidth = -1,
+  rootHeight = -1,
   ...props
 }) {
   if (!imageUrl) {
     return <></>;
   }
+  if (rootWidth < 0) rootWidth = width;
+  if (rootHeight < 0) rootHeight = height;
 
   return (
-    <mesh position={[0, 0, 0]}>
+    <mesh
+      {...props}
+      rotation-x={rotationX}
+      rotation-y={rotationY}
+      rotation-z={rotationZ}
+    >
       <RootContainer
         pixelSize={0.0007}
         precision={0.1}
-        position={[0, 0, 0]}
+        // position={offsetPosition}
         sizeX={rootWidth * 0.0007}
         sizeY={rootHeight * 0.0007}
       >
@@ -308,7 +328,9 @@ export function PKLayer({
           minWidth={width}
           width={width}
           height={height}
-          {...props}
+          border={1}
+          borderColor={"#f00"}
+          overflow="hidden"
         >
           <Suspense>
             <Image url={imageUrl} width={width} height={height} />
@@ -614,7 +636,7 @@ function JointMesh({
       }}
       {...props}
     >
-      <sphereGeometry />
+      <boxGeometry />
       <meshPhysicalMaterial color={"#f09"} transparent={true} opacity={0.1} />
     </mesh>
   );
