@@ -209,6 +209,7 @@ export default function PKCanvas({
             }
           >
             <Hands
+              type="touch"
               rayColor={"rgba(0,0,0)"}
               raySize={0}
               onPointerDownMissed={() => {
@@ -630,14 +631,14 @@ function JointMesh({
 }) {
   return (
     <mesh
-      scale={0.04}
+      scale={0.02}
       onUpdate={(self) => {
         self.userData.name = name;
       }}
       {...props}
     >
       <boxGeometry />
-      <meshPhysicalMaterial color={"#f09"} transparent={true} opacity={0.1} />
+      <meshPhysicalMaterial color={"#f09"} transparent={true} opacity={0.0} />
     </mesh>
   );
 }

@@ -415,13 +415,13 @@ function Scene({ ...props }) {
                 borderRadius={999}
                 // border={1}
               >
-                {/* <Image
+                <Image
                   animation={noAnimation}
                   url={"/tests/ProfilePic.png"}
                   // width={"100%"}
                   // height={"100%"}
                   {...pogProps}
-                /> */}
+                />
                 <Container
                   positionType="absolute"
                   positionBottom={0}
@@ -434,12 +434,12 @@ function Scene({ ...props }) {
                   // backgroundColor={"#f00"}
                   // translateZ={40}
                 >
-                  {/* <Image
+                  <Image
                     animation={noAnimation}
                     url={"/tests/WhatAppIcon.png"}
                     width={"100%"}
                     height={"100%"}
-                  /> */}
+                  />
                 </Container>
               </Container>
 
@@ -459,12 +459,12 @@ function Scene({ ...props }) {
                   height={140}
                   // border={1}
                 >
-                  {/* <Image
+                  <Image
                     animation={noAnimation}
                     url={"/tests/MessageNotif.png"}
                     width={227}
                     height={140}
-                  /> */}
+                  />
                 </Container>
                 <Container {...buttonStyle}>
                   <Text {...buttonTextStyle}>Great to hear!</Text>
@@ -487,7 +487,7 @@ function Scene({ ...props }) {
               // borderColor={"#f09"}
             >
               <Suspense>
-                {/* <Image
+                <Image
                   animation={noAnimation}
                   url={"/tests/Glow.png"}
                   // positionTop={Math.max(400, (offsetRef.current / 2) * 1800)}
@@ -497,7 +497,7 @@ function Scene({ ...props }) {
                   width={1012}
                   height={730}
                   opacity={0.7}
-                /> */}
+                />
               </Suspense>
             </Container>
           </DefaultStyleProvider>
